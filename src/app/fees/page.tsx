@@ -108,7 +108,7 @@ export default function FeesPage() {
                       <Shield className="w-6 h-6 text-blue-600" />
                     </div>
                     <h4 className="font-semibold text-gray-900 mb-2">No Interest</h4>
-                    <p className="text-sm text-gray-600">We don't charge interest on your payments</p>
+                    <p className="text-sm text-gray-600">We don&apos;t charge interest on your payments</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -132,7 +132,7 @@ export default function FeesPage() {
           {/* What's Included Section */}
           <div className="max-w-6xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-              What's Included in Our Fee
+              What&apos;s Included in Our Fee
             </h2>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

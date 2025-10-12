@@ -31,6 +31,7 @@ interface Installment {
   due_date: string
   status: string
   paid_at: string | null
+  created_at: string
 }
 
 export default function DashboardPage() {
