@@ -16,7 +16,7 @@ export default function HomePage() {
   const [qrUrl, setQrUrl] = useState('')
 
   useEffect(() => {
-    const isDev = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder')
+    const isDev = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder') ?? false
     setIsDevMode(isDev)
     
     if (isLoaded && user && !isDev) {
@@ -457,7 +457,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  "Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!"
+                  &quot;Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
                 </p>
               </CardContent>
             </Card>
@@ -479,7 +479,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  "As an international student, I was worried about credit checks. Wepply's no-credit-check policy was exactly what I needed."
+                  &quot;As an international student, I was worried about credit checks. Wepply&apos;s no-credit-check policy was exactly what I needed.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -501,7 +501,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  "The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends."
+                  &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -528,7 +528,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      "Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!"
+                      &quot;Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -552,7 +552,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      "As an international student, I was worried about credit checks. Wepply's no-credit-check policy was exactly what I needed."
+                      &quot;As an international student, I was worried about credit checks. Wepply&apos;s no-credit-check policy was exactly what I needed.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -576,7 +576,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      "The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends."
+                      &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -600,7 +600,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      "Wepply's university partnership made everything seamless. I could focus on my studies instead of worrying about payment deadlines."
+                      &quot;Wepply&apos;s university partnership made everything seamless. I could focus on my studies instead of worrying about payment deadlines.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -624,7 +624,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      "The transparent fee structure gave me confidence. No surprises, just clear payment management that works."
+                      &quot;The transparent fee structure gave me confidence. No surprises, just clear payment management that works.&quot;
                     </p>
                   </CardContent>
                 </Card>

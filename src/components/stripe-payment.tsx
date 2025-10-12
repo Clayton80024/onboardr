@@ -11,14 +11,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreditCard, Loader2, AlertCircle } from 'lucide-react'
+import type { UserResource } from '@clerk/types'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 interface PaymentFormProps {
   tuitionAmount: string
   paymentPlan: string
-  formData: Record<string, any>
-  user: Record<string, any> | null
+  formData: Record<string, unknown>
+  user: UserResource | null
   onSuccess: (subscriptionId: string) => void
   onError: (error: string) => void
   isLoading: boolean
@@ -227,8 +228,8 @@ function calculateFirstPayment(tuitionAmount: string, paymentPlan: string) {
 interface StripePaymentProps {
   tuitionAmount: string
   paymentPlan: string
-  formData: Record<string, any>
-  user: Record<string, any> | null
+  formData: Record<string, unknown>
+  user: UserResource | null
   onSuccess: (subscriptionId: string) => void
   onError: (error: string) => void
   isLoading: boolean

@@ -176,7 +176,7 @@ export default function QRCodeComponent({
             Copy
           </Button>
           
-          {navigator.share && (
+          {'share' in navigator && (
             <Button
               variant="outline"
               size="sm"

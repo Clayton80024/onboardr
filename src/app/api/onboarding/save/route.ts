@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
       console.log('No user ID found, returning 401')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    // Get user details from Clerk
+    const user = await currentUser()
 
     // Parse the request body
     const body = await request.json()
