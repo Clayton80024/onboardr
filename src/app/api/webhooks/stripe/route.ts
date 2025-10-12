@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
       // Update installment status in database
       try {
         const supabase = createServiceClient()
-        const supabase = createServiceClient()
         const { error } = await supabase
           .from('installments')
           .update({
