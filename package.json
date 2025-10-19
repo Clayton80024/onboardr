@@ -1,12 +1,16 @@
 {
-  "name": "wepply",
+  "name": "installo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:deploy": "supabase functions deploy stripe-webhook",
+    "supabase:logs": "supabase functions logs stripe-webhook"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.2",

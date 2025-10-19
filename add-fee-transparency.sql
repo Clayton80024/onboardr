@@ -11,15 +11,15 @@ add column if not exists total_amount numeric(10, 2);
 update onboarding_data 
 set 
   admin_fee = case 
-    when payment_plan = 'basic' then tuition_amount * 0.30  -- 30% fee
-    when payment_plan = 'premium' then tuition_amount * 0.25  -- 25% fee
-    when payment_plan = 'flexible' then tuition_amount * 0.20  -- 20% fee
+    when payment_plan = 'basic' then tuition_amount * 0.055  -- 5.5% fee
+    when payment_plan = 'premium' then tuition_amount * 0.065  -- 6.5% fee
+    when payment_plan = 'flexible' then tuition_amount * 0.08  -- 8% fee
     else 0.00
   end,
   total_amount = tuition_amount + case 
-    when payment_plan = 'basic' then tuition_amount * 0.30  -- 30% fee
-    when payment_plan = 'premium' then tuition_amount * 0.25  -- 25% fee
-    when payment_plan = 'flexible' then tuition_amount * 0.20  -- 20% fee
+    when payment_plan = 'basic' then tuition_amount * 0.055  -- 5.5% fee
+    when payment_plan = 'premium' then tuition_amount * 0.065  -- 6.5% fee
+    when payment_plan = 'flexible' then tuition_amount * 0.08  -- 8% fee
     else 0.00
   end
 where admin_fee is null or total_amount is null;

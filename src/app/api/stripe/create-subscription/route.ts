@@ -139,7 +139,7 @@ export async function POST(req: Request) {
       customer: customer.id,
       payment_method: paymentMethodId,
       confirm: true,
-      description: `Upfront tuition payment - ${universityName}`,
+      description: `Tuition Payment - Installment 1 of ${plan.totalPayments} - ${universityName}`,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/onboarding`,
       automatic_payment_methods: {
         enabled: true,
@@ -150,7 +150,7 @@ export async function POST(req: Request) {
         studentId: studentId,
         university: universityName,
         paymentPlan: paymentPlan,
-        paymentType: 'upfront_tuition'
+        paymentType: 'installment_1'
       }
     })
 
@@ -190,6 +190,47 @@ export async function POST(req: Request) {
 
     // Save onboarding data to Supabase
     const supabase = createServiceClient()
+    
+    // Create payment records in payments table
+    const paymentRecords = []
+    
+    // First payment (upfront)
+    paymentRecords.push({
+      user_id: userId,
+      amount: upfrontPaymentAmount / 100, // Convert from cents to dollars
+      payment_plan: paymentPlan,
+      status: 'succeeded', // Already charged
+      payment_type: 'installment_1',
+      stripe_payment_intent_id: upfrontPaymentIntent.id,
+      due_date: new Date().toISOString()
+    })
+    
+    // Create payment records for remaining installments
+    for (let i = 2; i <= plan.totalPayments; i++) {
+      const dueDate = new Date()
+      dueDate.setMonth(dueDate.getMonth() + (i - 1))
+      
+      paymentRecords.push({
+        user_id: userId,
+        amount: remainingPaymentAmount / 100, // Convert from cents to dollars
+        payment_plan: paymentPlan,
+        status: 'pending',
+        payment_type: `installment_${i}`,
+        due_date: dueDate.toISOString()
+      })
+    }
+    
+    // Insert payment records
+    const { error: paymentError } = await supabase
+      .from('payments')
+      .insert(paymentRecords)
+    
+    if (paymentError) {
+      console.error('Error creating payment records:', paymentError)
+    } else {
+      console.log('Payment records created successfully')
+    }
+
     const { data: onboardingData, error: onboardingError } = await supabase
       .from('onboarding_data')
       .insert({

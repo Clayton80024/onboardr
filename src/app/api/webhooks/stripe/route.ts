@@ -3,6 +3,18 @@ import { stripe } from '@/lib/stripe'
 import { headers } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase'
 
+/**
+ * DEPRECATED: This webhook handler is being replaced by Supabase Edge Functions
+ * for better security and performance. 
+ * 
+ * New webhook endpoint: https://YOUR_PROJECT_REF.supabase.co/functions/v1/stripe-webhook
+ * 
+ * To migrate:
+ * 1. Deploy the edge function: npm run supabase:deploy
+ * 2. Update your Stripe webhook URL to use the edge function endpoint
+ * 3. Remove this file once migration is complete
+ */
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const headersList = await headers()

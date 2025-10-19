@@ -17,7 +17,7 @@ export default function FeesPage() {
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">Wepply</h1>
+              <h1 className="text-2xl font-bold text-white">Installo</h1>
             </div>
             <Link href="/">
               <Button variant="ghost" className="text-gray-300 hover:text-gray-300">
@@ -283,7 +283,7 @@ export default function FeesPage() {
                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Wepply</span>
+                <span className="text-xl font-bold">Installo</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 Helping international students manage their tuition payments with flexible payment management solutions, working directly with universities.
@@ -312,7 +312,7 @@ export default function FeesPage() {
           </div>
           
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2024 Wepply. All rights reserved.</p>
+            <p>© 2024 Installo. All rights reserved.</p>
           </div>
         </div>
       </footer>

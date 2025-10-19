@@ -62,6 +62,7 @@ const paymentPlans = [
   }
 ]
 
+
 export default function OnboardingPage() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
@@ -269,7 +270,7 @@ export default function OnboardingPage() {
               <div className="mx-auto mb-6 w-20 h-20 bg-green-600 rounded-full flex items-center justify-center">
                 <User className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl font-bold text-white mb-2">Welcome to Wepply!</CardTitle>
+              <CardTitle className="text-3xl font-bold text-white mb-2">Welcome to Installo!</CardTitle>
               <CardDescription className="text-gray-300 text-lg">
                 Let&apos;s get you started with splitting your tuition payments
               </CardDescription>
@@ -278,7 +279,7 @@ export default function OnboardingPage() {
               <div className="text-center">
                 <p className="text-lg text-gray-300 mb-4">
                   {isDev ? (
-                    <>You&apos;re in demo mode: <strong className="text-white">demo@wepply.com</strong></>
+                    <>You&apos;re in demo mode: <strong className="text-white">demo@installo.com</strong></>
                   ) : (
                     <>You&apos;re signed in as: <strong className="text-white">{user?.emailAddresses[0]?.emailAddress}</strong></>
                   )}
@@ -630,6 +631,7 @@ export default function OnboardingPage() {
       case 6:
         return (
           <div className="w-full max-w-2xl mx-auto">
+            {/* Payment Form Only */}
             <StripePayment
               tuitionAmount={formData.tuitionAmount}
               paymentPlan={formData.paymentPlan}
@@ -769,7 +771,7 @@ export default function OnboardingPage() {
             <CardContent className="space-y-4">
               <div className="text-center space-y-2">
                 <p className="text-lg font-semibold text-green-600">
-                  Welcome to Wepply!
+                  Welcome to Installo!
                 </p>
                 <p className="text-sm text-gray-600">
                   Your subscription is active and your first payment has been processed.
