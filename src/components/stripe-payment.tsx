@@ -255,7 +255,7 @@ export default function StripePayment({
             Payment Information
           </CardTitle>
           <CardDescription>
-            Secure payment powered by Stripe. Your card information is encrypted and secure.
+            Complete your payment to start your installment plan. Your card will be charged ${calculateFirstPayment(tuitionAmount, paymentPlan).toFixed(2)} today, then ${calculateFirstPayment(tuitionAmount, paymentPlan).toFixed(2)} each month for your remaining installments.
           </CardDescription>
         </CardHeader>
         <CardContent>

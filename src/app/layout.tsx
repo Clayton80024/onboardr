@@ -5,8 +5,41 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Wepply - Student Tuition Split',
-  description: 'Split your tuition payments with ease',
+  title: 'Installo - Student Tuition Payment Plans',
+  description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students with no credit check required.',
+  keywords: 'tuition payment plans, student loans, installment payments, international students, university payments, flexible tuition, no credit check',
+  authors: [{ name: 'Installo Team' }],
+  creator: 'Installo',
+  publisher: 'Installo',
+  robots: 'index, follow',
+  icons: {
+    icon: '/favicon-16x16.png',
+    shortcut: '/favicon-16x16.png',
+    apple: '/favicon-16x16.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://installo.com',
+    siteName: 'Installo',
+    title: 'Installo - Student Tuition Payment Plans',
+    description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students with no credit check required.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Installo - Student Tuition Payment Plans',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Installo - Student Tuition Payment Plans',
+    description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students.',
+    images: ['/og-image.jpg'],
+    creator: '@installo',
+  },
   manifest: '/manifest.json',
 }
 
@@ -24,7 +57,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      afterSignInUrl="/onboarding"
+      afterSignUpUrl="/onboarding"
+    >
       <html lang="en">
         <body className={inter.className}>
           {children}

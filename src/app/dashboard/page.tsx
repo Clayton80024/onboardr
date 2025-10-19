@@ -4,7 +4,8 @@ import { useUser, SignOutButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { GraduationCap, DollarSign, Calendar, User, QrCode } from 'lucide-react'
+import { Progress } from '@/components/ui/progress'
+import { GraduationCap, DollarSign, Calendar, User, QrCode, ChevronDown, ChevronUp, Wallet } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import QRCodeComponent from '@/components/qr-code'
@@ -34,6 +35,15 @@ interface Installment {
   created_at: string
 }
 
+interface Payment {
+  id: string
+  amount: number
+  status: string
+  payment_type: string
+  due_date: string
+  created_at: string
+}
+
 export default function DashboardPage() {
   const { user, isLoaded } = useUser()
   const router = useRouter()
@@ -41,7 +51,9 @@ export default function DashboardPage() {
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean | null>(null)
   const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null)
   const [installments, setInstallments] = useState<Installment[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(true)
+  const [showAllInstallments, setShowAllInstallments] = useState(false)
 
   useEffect(() => {
     if (isLoaded && !user) {
@@ -82,6 +94,14 @@ export default function DashboardPage() {
               if (installmentsData.success) {
                 setInstallments(installmentsData.data)
               }
+
+              // Fetch payments for balance calculation
+              const paymentsResponse = await fetch('/api/payments')
+              const paymentsData = await paymentsResponse.json()
+              
+              if (paymentsData.success) {
+                setPayments(paymentsData.data)
+              }
             }
           } else {
             // Redirect to onboarding if not completed
@@ -100,6 +120,42 @@ export default function DashboardPage() {
 
     fetchUserData()
   }, [isLoaded, user, router])
+
+  // Calculate balance information
+  const calculateBalanceInfo = () => {
+    if (!onboardingData || !payments.length) {
+      return {
+        totalAmount: 0,
+        paidAmount: 0,
+        remainingAmount: 0,
+        progressPercentage: 0,
+        totalPayments: 0,
+        completedPayments: 0
+      }
+    }
+
+    const totalAmount = onboardingData.total_amount || 0
+    const paidAmount = payments
+      .filter(payment => payment.status === 'succeeded')
+      .reduce((sum, payment) => sum + payment.amount, 0)
+    
+    const remainingAmount = totalAmount - paidAmount
+    const progressPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0
+    
+    const totalPayments = payments.length
+    const completedPayments = payments.filter(payment => payment.status === 'succeeded').length
+
+    return {
+      totalAmount,
+      paidAmount,
+      remainingAmount,
+      progressPercentage,
+      totalPayments,
+      completedPayments
+    }
+  }
+
+  const balanceInfo = calculateBalanceInfo()
 
   if (!isLoaded || loading) {
     return (
@@ -126,7 +182,7 @@ export default function DashboardPage() {
               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Wepply Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Installo Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
@@ -275,6 +331,73 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Remaining Balance Card */}
+          <Card className="border-0 shadow-lg bg-white">
+            <CardHeader>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Wallet className="w-4 h-4 text-white" />
+                </div>
+                <CardTitle className="text-lg font-semibold text-gray-900">Remaining Balance</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Progress Bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Payment Progress</span>
+                    <span>{balanceInfo.completedPayments}/{balanceInfo.totalPayments} payments</span>
+                  </div>
+                  <Progress 
+                    value={balanceInfo.progressPercentage} 
+                    className="h-2"
+                  />
+                  <div className="text-center text-xs text-gray-500">
+                    {balanceInfo.progressPercentage.toFixed(1)}% Complete
+                  </div>
+                </div>
+
+                {/* Balance Breakdown */}
+                <div className="space-y-3">
+                  <div className="p-3 bg-gray-100 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-700">Total Amount:</span>
+                      <span className="font-semibold text-gray-900">${balanceInfo.totalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-green-700">Amount Paid:</span>
+                      <span className="font-semibold text-green-800">${balanceInfo.paidAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-orange-700">Remaining Balance:</span>
+                      <span className="font-semibold text-orange-800">${balanceInfo.remainingAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <div className="text-center">
+                  {balanceInfo.remainingAmount <= 0 ? (
+                    <Badge className="bg-green-600 text-white border-green-600">
+                      Payment Complete
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="border-orange-500 text-orange-600">
+                      {balanceInfo.totalPayments - balanceInfo.completedPayments} Payments Remaining
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* QR Code Section */}
@@ -286,7 +409,7 @@ export default function DashboardPage() {
                 <CardTitle>Share Access</CardTitle>
               </div>
               <CardDescription>
-                Share this QR code with others to give them access to Wepply onboarding
+                Share this QR code with others to give them access to Installo onboarding
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -294,8 +417,8 @@ export default function DashboardPage() {
                 {qrUrl && (
                   <QRCodeComponent 
                     url={qrUrl}
-                    title="Wepply Access QR Code"
-                    description="Scan to access Wepply onboarding (login required)"
+                    title="Installo Access QR Code"
+                    description="Scan to access Installo onboarding (login required)"
                     size={200}
                     logoSize={50}
                   />
@@ -308,17 +431,36 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <Card className="mt-8">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your recent payment history and account activity
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>
+                  Your recent payment history and account activity
+                </CardDescription>
+              </div>
+              {installments.length > 5 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAllInstallments(!showAllInstallments)}
+                  className="flex items-center space-x-1"
+                >
+                  <span>{showAllInstallments ? 'Show Less' : 'See More'}</span>
+                  {showAllInstallments ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {installments.length > 0 ? (
                 installments
                   .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                  .slice(0, 5)
+                  .slice(0, showAllInstallments ? installments.length : 5)
                   .map((installment) => (
                     <div key={installment.id} className={`flex items-center justify-between p-4 rounded-lg ${
                       installment.status === 'paid' ? 'bg-green-50' : 

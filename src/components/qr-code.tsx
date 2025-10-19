@@ -61,7 +61,7 @@ export default function QRCodeComponent({
     if (!qrDataUrl) return
     
     const link = document.createElement('a')
-    link.download = 'wepply-qr-code.png'
+    link.download = 'installo-qr-code.png'
     link.href = qrDataUrl
     link.click()
   }
@@ -87,10 +87,10 @@ export default function QRCodeComponent({
       const response = await fetch(qrDataUrl)
       const blob = await response.blob()
       if (navigator.share) {
-        const file = new File([blob], 'wepply-qr-code.png', { type: 'image/png' })
+        const file = new File([blob], 'installo-qr-code.png', { type: 'image/png' })
         await navigator.share({
-          title: 'Wepply QR Code',
-          text: 'Scan this QR code to access Wepply onboarding',
+          title: 'Installo QR Code',
+          text: 'Scan this QR code to access Installo onboarding',
           files: [file]
         })
       }

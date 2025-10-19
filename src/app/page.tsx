@@ -58,10 +58,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-white">Wepply</h1>
+              <img 
+                src="/logo-installo.png" 
+                alt="Installo Logo" 
+                className="w-8 h-8 object-contain"
+              />
+              <h1 className="text-2xl font-bold text-white">Installo</h1>
             </div>
             <div className="flex items-center space-x-4">
               <SignInButton mode="modal">
@@ -434,7 +436,7 @@ export default function HomePage() {
               What students are saying
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Real experiences from international students who manage their tuition payments with Wepply
+              Real experiences from international students who manage their tuition payments with Installo
             </p>
           </div>
 
@@ -457,7 +459,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  &quot;Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
+                  &quot;Installo made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
                 </p>
               </CardContent>
             </Card>
@@ -479,7 +481,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  &quot;As an international student, I was worried about credit checks. Wepply&apos;s no-credit-check policy was exactly what I needed.&quot;
+                  &quot;As an international student, I was worried about credit checks. Installo&apos;s no-credit-check policy was exactly what I needed.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -501,7 +503,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends.&quot;
+                  &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Installo to all my international friends.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -528,7 +530,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;Wepply made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
+                      &quot;Installo made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -552,7 +554,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;As an international student, I was worried about credit checks. Wepply&apos;s no-credit-check policy was exactly what I needed.&quot;
+                      &quot;As an international student, I was worried about credit checks. Installo&apos;s no-credit-check policy was exactly what I needed.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -576,7 +578,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Wepply to all my international friends.&quot;
+                      &quot;The process was so simple and the customer service team was incredibly helpful. I recommend Installo to all my international friends.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -600,7 +602,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;Wepply&apos;s university partnership made everything seamless. I could focus on my studies instead of worrying about payment deadlines.&quot;
+                      &quot;Installo&apos;s university partnership made everything seamless. I could focus on my studies instead of worrying about payment deadlines.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -694,10 +696,12 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">Wepply</span>
+                <img 
+                  src="/logo-installo.png" 
+                  alt="Installo Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                <span className="text-xl font-bold">Installo</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 Helping international students manage their tuition payments with flexible payment management solutions, working directly with universities.
@@ -726,7 +730,7 @@ export default function HomePage() {
           </div>
           
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2024 Wepply. All rights reserved.</p>
+            <p>© 2024 Installo. All rights reserved.</p>
           </div>
         </div>
       </footer>

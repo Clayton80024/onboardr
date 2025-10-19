@@ -1,6 +1,6 @@
-# 🚀 Wepply Setup Guide
+# 🚀 Installo Setup Guide
 
-Your Wepply app is ready! The app now works in **demo mode** without API keys, so you can test the UI immediately.
+Your Installo app is ready! The app now works in **demo mode** without API keys, so you can test the UI immediately.
 
 ## 🎯 **Quick Start (Demo Mode)**
 
