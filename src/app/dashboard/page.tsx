@@ -33,6 +33,9 @@ interface Installment {
   status: string
   paid_at: string | null
   created_at: string
+  payment_method?: string
+  payment_link?: string
+  payment_link_expires_at?: string
 }
 
 interface Payment {
@@ -73,9 +76,14 @@ export default function DashboardPage() {
         try {
           setLoading(true)
           
+          // Add a small delay to ensure Edge Function has completed
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
           // Fetch onboarding status and data
           const statusResponse = await fetch('/api/onboarding/status')
           const statusData = await statusResponse.json()
+          
+          console.log('Dashboard status check:', statusData)
           
           setOnboardingCompleted(statusData.onboardingCompleted)
           
@@ -95,7 +103,7 @@ export default function DashboardPage() {
                 setInstallments(installmentsData.data)
               }
 
-              // Fetch payments for balance calculation
+              // Fetch payments (optional - not used for balance calculation anymore)
               const paymentsResponse = await fetch('/api/payments')
               const paymentsData = await paymentsResponse.json()
               
@@ -104,6 +112,16 @@ export default function DashboardPage() {
               }
             }
           } else {
+            // If onboarding not completed, try debug endpoint to see what's happening
+            console.log('Onboarding not completed, checking debug info...')
+            try {
+              const debugResponse = await fetch('/api/debug-onboarding')
+              const debugData = await debugResponse.json()
+              console.log('Debug info:', debugData)
+            } catch (debugError) {
+              console.error('Debug check failed:', debugError)
+            }
+            
             // Redirect to onboarding if not completed
             router.push('/onboarding')
           }
@@ -121,9 +139,34 @@ export default function DashboardPage() {
     fetchUserData()
   }, [isLoaded, user, router])
 
+  const handlePayNow = async (installment: Installment) => {
+    if (installment.payment_link) {
+      // Check if payment link is expired
+      if (installment.payment_link_expires_at) {
+        const expiresAt = new Date(installment.payment_link_expires_at)
+        const now = new Date()
+        
+        if (expiresAt < now) {
+          alert('This payment link has expired. Please contact support to get a new payment link.')
+          return
+        }
+      }
+      
+      // Open ACH payment link in new tab
+      window.open(installment.payment_link, '_blank')
+    } else {
+      alert('Payment link not available. Please contact support.')
+    }
+  }
+
+  const handleSetupPayment = async (installment: Installment) => {
+    // Same as handlePayNow
+    await handlePayNow(installment)
+  }
+
   // Calculate balance information
   const calculateBalanceInfo = () => {
-    if (!onboardingData || !payments.length) {
+    if (!onboardingData || !installments.length) {
       return {
         totalAmount: 0,
         paidAmount: 0,
@@ -135,15 +178,15 @@ export default function DashboardPage() {
     }
 
     const totalAmount = onboardingData.total_amount || 0
-    const paidAmount = payments
-      .filter(payment => payment.status === 'succeeded')
-      .reduce((sum, payment) => sum + payment.amount, 0)
+    const paidAmount = installments
+      .filter(installment => installment.status === 'paid')
+      .reduce((sum, installment) => sum + installment.amount, 0)
     
     const remainingAmount = totalAmount - paidAmount
     const progressPercentage = totalAmount > 0 ? (paidAmount / totalAmount) * 100 : 0
     
-    const totalPayments = payments.length
-    const completedPayments = payments.filter(payment => payment.status === 'succeeded').length
+    const totalPayments = installments.length
+    const completedPayments = installments.filter(installment => installment.status === 'paid').length
 
     return {
       totalAmount,
@@ -309,8 +352,12 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-600">
                           <strong>Payment #:</strong> {nextPayment.installment_number}
                         </p>
-                        <Button size="sm" className="w-full">
-                          Pay Now
+                        <Button 
+                          size="sm" 
+                          className="w-full"
+                          onClick={() => handlePayNow(nextPayment)}
+                        >
+                          {nextPayment.payment_method === 'ach' ? 'Pay via ACH' : 'Pay Now'}
                         </Button>
                       </>
                     )
@@ -475,6 +522,15 @@ export default function DashboardPage() {
                           <p className="font-medium">
                             Payment #{installment.installment_number} - {installment.status === 'paid' ? 'Successful' : 
                             installment.status === 'failed' ? 'Failed' : 'Pending'}
+                            {installment.payment_method && (
+                              <span className={`ml-2 text-xs px-2 py-1 rounded ${
+                                installment.payment_method === 'card' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {installment.payment_method === 'card' ? 'Card' : 'ACH'}
+                              </span>
+                            )}
                           </p>
                           <p className="text-sm text-gray-600">
                             {installment.status === 'paid' && installment.paid_at 
@@ -484,12 +540,36 @@ export default function DashboardPage() {
                           </p>
                         </div>
                       </div>
-                      <span className={`font-semibold ${
-                        installment.status === 'paid' ? 'text-green-600' : 
-                        installment.status === 'failed' ? 'text-red-600' : 'text-gray-600'
-                      }`}>
-                        ${installment.amount.toFixed(2)}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className={`font-semibold ${
+                          installment.status === 'paid' ? 'text-green-600' : 
+                          installment.status === 'failed' ? 'text-red-600' : 'text-gray-600'
+                        }`}>
+                          ${installment.amount.toFixed(2)}
+                        </span>
+                        {installment.status === 'pending' && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handlePayNow(installment)}
+                            className={`${
+                              installment.payment_method === 'ach' 
+                                ? 'bg-blue-600 hover:bg-blue-700' 
+                                : 'bg-green-600 hover:bg-green-700'
+                            }`}
+                          >
+                            {installment.payment_method === 'ach' ? 'Pay via ACH' : 'Pay Now'}
+                          </Button>
+                        )}
+                        {installment.status === 'pending_setup' && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => handleSetupPayment(installment)}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            Setup Payment
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))
               ) : (

@@ -1,13 +1,29 @@
-import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { createServiceClient } from '@/lib/supabase'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover',
-})
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-export async function POST(req: Request) {
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   try {
+    // Initialize Stripe
+    const stripe = await import('https://esm.sh/stripe@19.1.0')
+    const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY')!, {
+      apiVersion: '2025-09-30.clover',
+    })
+
+    // Initialize Supabase
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
     const { 
       paymentMethodId, 
       tuitionAmount, 
@@ -56,7 +72,7 @@ export async function POST(req: Request) {
     console.log(`📊 Payment calculation: Tuition: $${tuition}, Admin Fee: $${adminFee.toFixed(2)}, Total: $${totalAmount.toFixed(2)}, Installment: $${installmentAmount.toFixed(2)}`)
 
     // Create Stripe customer
-    const customer = await stripe.customers.create({
+    const customer = await stripeClient.customers.create({
       email: email,
       name: `${firstName} ${lastName}`,
       phone: phoneNumber,
@@ -78,20 +94,22 @@ export async function POST(req: Request) {
     console.log(`👤 Created Stripe customer: ${customer.id}`)
 
     // Attach payment method to customer
-    await stripe.paymentMethods.attach(paymentMethodId, {
+    await stripeClient.paymentMethods.attach(paymentMethodId, {
       customer: customer.id,
     })
 
     console.log(`💳 Attached payment method: ${paymentMethodId}`)
 
     // HYBRID PAYMENT SYSTEM: First payment via credit card
-    const upfrontPaymentIntent = await stripe.paymentIntents.create({
+    const upfrontPaymentIntent = await stripeClient.paymentIntents.create({
       amount: Math.round(installmentAmount * 100), // First installment amount
       currency: 'usd',
       customer: customer.id,
       payment_method: paymentMethodId,
-      confirmation_method: 'manual',
-      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never' // Only allow card payments, no redirects
+      },
       metadata: {
         userId: userId,
         studentId: studentId,
@@ -102,17 +120,25 @@ export async function POST(req: Request) {
       }
     })
 
-    console.log(`💳 Created upfront payment intent: ${upfrontPaymentIntent.id}`)
+    // Confirm the payment intent
+    const confirmedPaymentIntent = await stripeClient.paymentIntents.confirm(upfrontPaymentIntent.id)
+
+    console.log(`💳 Created and confirmed upfront payment intent: ${confirmedPaymentIntent.id}`)
 
     // Generate ACH payment links for remaining installments
     const paymentLinks = []
     const currentDate = new Date()
     
     for (let i = 2; i <= plan.totalPayments; i++) {
-      const expiresAt = new Date(currentDate)
-      expiresAt.setDate(expiresAt.getDate() + 30) // 30 days from now
+      // Calculate due date for this installment (monthly payments)
+      const dueDate = new Date(currentDate)
+      dueDate.setMonth(dueDate.getMonth() + (i - 1)) // Installment 2 = 1 month from now, etc.
       
-      const paymentLink = await stripe.paymentLinks.create({
+      // Set expiration to 7 days after due date (grace period)
+      const expiresAt = new Date(dueDate)
+      expiresAt.setDate(expiresAt.getDate() + 7) // 7 days grace period after due date
+      
+      const paymentLink = await stripeClient.paymentLinks.create({
         line_items: [
           {
             price_data: {
@@ -130,7 +156,7 @@ export async function POST(req: Request) {
         after_completion: {
           type: 'redirect',
           redirect: {
-            url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?payment=success&installment=${i}`
+            url: `${Deno.env.get('NEXT_PUBLIC_APP_URL') || 'http://localhost:3000'}/dashboard?payment=success&installment=${i}`
           }
         },
         metadata: {
@@ -154,18 +180,18 @@ export async function POST(req: Request) {
     }
 
     // Save onboarding data to Supabase
-    const supabase = createServiceClient()
-    
     const { data: onboardingData, error: onboardingError } = await supabase
       .from('onboarding_data')
       .insert({
         user_id: userId,
         university_name: universityName,
-        tuition_amount: tuition,
+        tuition_amount: parseFloat(tuition.toString()),
+        admin_fee: adminFee,
+        total_amount: totalAmount,
         payment_plan: paymentPlan,
         stripe_customer_id: customer.id,
         stripe_subscription_id: null, // No subscription for hybrid payments
-        stripe_payment_intent_id: upfrontPaymentIntent.id,
+        stripe_payment_method_id: paymentMethodId,
         student_id: studentId,
         student_email: studentEmail,
         first_name: firstName,
@@ -191,7 +217,21 @@ export async function POST(req: Request) {
 
     if (onboardingError) {
       console.error('❌ Error saving onboarding data:', onboardingError)
-      throw new Error('Failed to save onboarding data')
+      console.error('❌ Onboarding data being inserted:', {
+        user_id: userId,
+        university_name: universityName,
+        tuition_amount: tuition,
+        admin_fee: adminFee,
+        total_amount: totalAmount,
+        payment_plan: paymentPlan,
+        student_id: studentId,
+        student_email: studentEmail,
+        stripe_customer_id: customer.id,
+        stripe_subscription_id: null,
+        stripe_payment_method_id: paymentMethodId,
+        status: 'active'
+      })
+      throw new Error(`Failed to save onboarding data: ${onboardingError.message}`)
     }
 
     console.log(`💾 Saved onboarding data: ${onboardingData.id}`)
@@ -209,7 +249,7 @@ export async function POST(req: Request) {
       status: 'paid',
       paid_at: new Date().toISOString(),
       payment_method: 'card',
-      stripe_payment_intent_id: upfrontPaymentIntent.id,
+      stripe_payment_intent_id: confirmedPaymentIntent.id,
       created_at: new Date().toISOString()
     })
     
@@ -250,7 +290,9 @@ export async function POST(req: Request) {
       user_id: userId,
       stripe_payment_intent_id: installment.stripe_payment_intent_id,
       amount: installment.amount,
-      status: installment.status,
+      payment_plan: paymentPlan, // Required field
+      status: installment.status === 'paid' ? 'succeeded' : installment.status, // Convert 'paid' to 'succeeded'
+      due_date: installment.due_date, // Required field
       payment_type: `installment_${installment.installment_number}`,
       created_at: new Date().toISOString()
     }))
@@ -261,28 +303,38 @@ export async function POST(req: Request) {
 
     if (paymentsError) {
       console.error('❌ Error saving payments:', paymentsError)
-      throw new Error('Failed to save payments')
+      console.error('❌ Payments data being inserted:', payments)
+      throw new Error(`Failed to save payments: ${paymentsError.message}`)
     }
 
     console.log(`💳 Created ${payments.length} payment records`)
 
-    return NextResponse.json({
-      success: true,
-      upfrontPaymentIntentId: upfrontPaymentIntent.id,
-      clientSecret: upfrontPaymentIntent.client_secret,
-      onboardingId: onboardingData.id,
-      paymentLinks: paymentLinks,
-      message: 'Hybrid payment system created successfully'
-    })
+    return new Response(
+      JSON.stringify({
+        success: true,
+        upfrontPaymentIntentId: confirmedPaymentIntent.id,
+        clientSecret: confirmedPaymentIntent.client_secret,
+        onboardingId: onboardingData.id,
+        paymentLinks: paymentLinks,
+        message: 'Hybrid payment system created successfully'
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
 
   } catch (error) {
     console.error('❌ Error creating hybrid payment system:', error)
-    return NextResponse.json(
-      { 
-        error: error instanceof Error ? error.message : 'Failed to create hybrid payment system',
-        details: error instanceof Error ? error.stack : undefined
-      },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({
+        error: error.message || 'Failed to create hybrid payment system',
+        details: error.stack
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
     )
   }
-}
+})

@@ -14,22 +14,19 @@ export function PaymentBreakdown({ tuitionAmount, paymentPlan, universityName }:
   const paymentPlans = {
     basic: { 
       feePercentage: 0.055, 
-      totalPayments: 5, 
-      remainingPayments: 4,
+      totalPayments: 5,
       name: 'Basic Plan',
       color: 'bg-blue-100 text-blue-800'
     },
     premium: { 
       feePercentage: 0.065, 
-      totalPayments: 7, 
-      remainingPayments: 6,
+      totalPayments: 7,
       name: 'Premium Plan',
       color: 'bg-purple-100 text-purple-800'
     },
     flexible: { 
       feePercentage: 0.08, 
-      totalPayments: 9, 
-      remainingPayments: 8,
+      totalPayments: 9,
       name: 'Flexible Plan',
       color: 'bg-green-100 text-green-800'
     }
@@ -96,50 +93,34 @@ export function PaymentBreakdown({ tuitionAmount, paymentPlan, universityName }:
             <Calendar className="h-5 w-5" />
             Payment Schedule
           </CardTitle>
+          <p className="text-sm text-gray-600">
+            Monthly payments processed via Stripe
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Today's Payment */}
+          {/* Monthly Payments */}
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-blue-600" />
-                <span className="font-semibold text-blue-900">Today&apos;s Payment</span>
+                <CreditCard className="h-4 w-4 text-blue-600" />
+                <span className="font-semibold text-blue-900">Monthly Payment</span>
               </div>
               <Badge variant="default" className="bg-blue-600">
-                Installment 1 of {plan.totalPayments}
+                Stripe
               </Badge>
             </div>
             <div className="text-2xl font-bold text-blue-900">
               ${paymentAmount.toFixed(2)}
             </div>
             <div className="text-sm text-blue-700">
-              This payment will be charged immediately
+              Each month for {plan.totalPayments} months
             </div>
-          </div>
-
-          {/* Monthly Payments */}
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-600" />
-                <span className="font-semibold text-gray-900">Monthly Payments</span>
-              </div>
-              <Badge variant="outline">
-                {plan.remainingPayments} payments
-              </Badge>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">
-              ${paymentAmount.toFixed(2)}
-            </div>
-            <div className="text-sm text-gray-700">
-              Each month for {plan.remainingPayments} months
-            </div>
-            <div className="text-sm text-gray-600 mt-1">
+            <div className="text-sm text-blue-600 mt-1">
               Next payment: {nextPaymentDate.toLocaleDateString('en-US', { 
                 month: 'long', 
                 day: 'numeric', 
                 year: 'numeric' 
-              })}
+              })} • Automatic billing
             </div>
           </div>
         </CardContent>
@@ -155,16 +136,13 @@ export function PaymentBreakdown({ tuitionAmount, paymentPlan, universityName }:
         </CardHeader>
         <CardContent className="text-sm text-amber-800 space-y-2">
           <p>
-            • <strong>Today&apos;s Payment:</strong> You&apos;ll be charged ${paymentAmount.toFixed(2)} immediately
-          </p>
-          <p>
-            • <strong>Monthly Payments:</strong> ${paymentAmount.toFixed(2)} will be automatically charged each month for {plan.remainingPayments} months
+            • <strong>Monthly Payment:</strong> ${paymentAmount.toFixed(2)} charged automatically via Stripe
           </p>
           <p>
             • <strong>Total Amount:</strong> ${totalAmount.toFixed(2)} paid over {plan.totalPayments} installments
           </p>
           <p>
-            • <strong>Payment Method:</strong> Your card will be saved for automatic monthly payments
+            • <strong>Payment Method:</strong> Credit card payments processed securely through Stripe
           </p>
           <p>
             • <strong>Cancellation:</strong> You can cancel your payment plan at any time through your dashboard

@@ -107,8 +107,8 @@ serve(async (req) => {
         await handleInvoicePaymentFailed(event.data.object, supabase)
         break
 
-      case 'customer.subscription.deleted':
-        await handleSubscriptionDeleted(event.data.object, supabase)
+      case 'checkout.session.completed':
+        await handleCheckoutSessionCompleted(event.data.object, supabase)
         break
 
       default:
@@ -251,21 +251,72 @@ async function handleInvoicePaymentFailed(invoice: any, supabase: any) {
   }
 }
 
-async function handleSubscriptionDeleted(subscription: any, supabase: any) {
-  console.log(`Subscription ${subscription.id} was cancelled`)
+// Note: Payment link completion is now handled in handleCheckoutSessionCompleted
+// This function is kept for reference but not used
+
+// Handle checkout session completion (for payment links)
+async function handleCheckoutSessionCompleted(session: any, supabase: any) {
+  console.log(`Checkout session ${session.id} completed`)
   
   try {
-    const { error } = await supabase
-      .from('onboarding_data')
-      .update({
-        status: 'cancelled'
+    // Check if this is a payment link session
+    if (session.payment_link) {
+      console.log(`Processing payment link completion for link: ${session.payment_link}`)
+      
+      // Get the payment link details
+      const stripe = await import('https://esm.sh/stripe@19.1.0')
+      const stripeClient = new stripe.default(Deno.env.get('STRIPE_SECRET_KEY')!, {
+        apiVersion: '2025-09-30.clover',
       })
-      .eq('stripe_subscription_id', subscription.id)
-    
-    if (error) {
-      console.error('Error updating cancelled subscription:', error)
+      
+      const paymentLinkDetails = await stripeClient.paymentLinks.retrieve(session.payment_link)
+      
+      // Find the installment by payment link ID
+      const { data: installment, error: installmentError } = await supabase
+        .from('installments')
+        .select('*')
+        .eq('payment_link_id', session.payment_link)
+        .single()
+      
+      if (installmentError || !installment) {
+        console.error('Installment not found for payment link:', session.payment_link)
+        return
+      }
+      
+      // Update installment status to paid
+      const { error: updateError } = await supabase
+        .from('installments')
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+          stripe_payment_intent_id: session.payment_intent || null
+        })
+        .eq('id', installment.id)
+      
+      if (updateError) {
+        console.error('Error updating installment:', updateError)
+      } else {
+        console.log(`✅ Installment ${installment.installment_number} marked as paid`)
+      }
+      
+      // Update payments table
+      const { error: paymentUpdateError } = await supabase
+        .from('payments')
+        .update({
+          status: 'succeeded',
+          stripe_payment_intent_id: session.payment_intent || null
+        })
+        .eq('user_id', installment.user_id)
+        .eq('payment_type', `installment_${installment.installment_number}`)
+      
+      if (paymentUpdateError) {
+        console.error('Error updating payment record:', paymentUpdateError)
+      }
+      
+    } else {
+      console.log('Regular checkout session (not payment link)')
     }
   } catch (error) {
-    console.error('Error processing subscription.deleted:', error)
+    console.error('Error handling checkout session completion:', error)
   }
 }
