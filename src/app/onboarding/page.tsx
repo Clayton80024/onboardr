@@ -208,11 +208,16 @@ export default function OnboardingPage() {
     }
   }
 
-  const handlePaymentSuccess = (subscriptionId: string) => {
-    setSubscriptionId(subscriptionId)
+  const handlePaymentSuccess = (paymentIntentId: string) => {
+    setSubscriptionId(paymentIntentId)
     setPaymentError(null)
     // Move to next step after successful payment
     nextStep()
+    
+    // Auto-redirect to dashboard after a short delay to show success message
+    setTimeout(() => {
+      router.push('/dashboard')
+    }, 3000)
   }
 
   const handlePaymentError = (error: string) => {
@@ -630,38 +635,6 @@ export default function OnboardingPage() {
 
       case 6:
         return (
-          <div className="w-full max-w-2xl mx-auto">
-            {/* Payment Form Only */}
-            <StripePayment
-              tuitionAmount={formData.tuitionAmount}
-              paymentPlan={formData.paymentPlan}
-              formData={formData}
-              user={user}
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentError}
-              isLoading={isProcessingPayment}
-              setIsLoading={setIsProcessingPayment}
-            />
-            
-            {paymentError && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center">
-                  <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-                  <p className="text-sm text-red-600">{paymentError}</p>
-                </div>
-              </div>
-            )}
-            
-            <div className="mt-6 flex gap-2">
-              <Button variant="outline" onClick={prevStep} className="flex-1">
-                Back
-              </Button>
-            </div>
-          </div>
-        )
-
-      case 7:
-        return (
           <Card className="w-full max-w-2xl mx-auto">
             <CardHeader className="text-center">
               <div className="mx-auto mb-6 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
@@ -756,6 +729,38 @@ export default function OnboardingPage() {
           </Card>
         )
 
+      case 7:
+        return (
+          <div className="w-full max-w-2xl mx-auto">
+            {/* Stripe Payment Form */}
+            <StripePayment
+              tuitionAmount={formData.tuitionAmount}
+              paymentPlan={formData.paymentPlan}
+              formData={formData}
+              user={user}
+              onSuccess={handlePaymentSuccess}
+              onError={handlePaymentError}
+              isLoading={isProcessingPayment}
+              setIsLoading={setIsProcessingPayment}
+            />
+            
+            {paymentError && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                  <p className="text-sm text-red-600">{paymentError}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex gap-2">
+              <Button variant="outline" onClick={prevStep} className="flex-1">
+                Back
+              </Button>
+            </div>
+          </div>
+        )
+
       case 8:
         return (
           <Card className="w-full max-w-2xl mx-auto">
@@ -765,7 +770,7 @@ export default function OnboardingPage() {
               </div>
               <CardTitle className="text-3xl font-bold mb-2">Payment Successful!</CardTitle>
               <CardDescription className="text-lg">
-                Your tuition split plan has been activated
+                Your payment plan has been activated
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -774,13 +779,22 @@ export default function OnboardingPage() {
                   Welcome to Installo!
                 </p>
                 <p className="text-sm text-gray-600">
-                  Your subscription is active and your first payment has been processed.
+                  Your payment has been processed successfully via Stripe.
                 </p>
                 {subscriptionId && (
                   <p className="text-xs text-gray-500">
                     Subscription ID: {subscriptionId}
                   </p>
                 )}
+              </div>
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h4 className="font-semibold text-green-900 mb-2">Payment Setup Complete</h4>
+                <div className="space-y-1 text-sm text-green-700">
+                  <p>✅ Payment processed via Stripe</p>
+                  <p>✅ Subscription created successfully</p>
+                  <p>✅ Automatic monthly payments enabled</p>
+                  <p>✅ Secure payment processing activated</p>
+                </div>
               </div>
               <div className="space-y-2">
                 <Button 
