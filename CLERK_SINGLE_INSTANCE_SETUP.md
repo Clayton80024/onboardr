@@ -103,3 +103,6 @@ CLERK_SECRET_KEY=sk_test_your_existing_secret
 5. **Test authentication** on your live domain
 
 Your single Clerk instance can absolutely handle production - you just need to configure it properly!
+
+
+

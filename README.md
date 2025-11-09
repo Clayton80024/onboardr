@@ -1,6 +1,6 @@
-# Installo - Student Tuition Payment Plans
+# Wepply - Student Tuition Split Platform
 
-A modern PWA application built with Next.js that allows students to split their tuition payments into manageable installments with flexible payment plans.
+A modern PWA application built with Next.js that allows students to split their tuition payments into manageable installments.
 
 ## Features
 
@@ -36,7 +36,7 @@ A modern PWA application built with Next.js that allows students to split their 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd installo
+   cd wepply
    ```
 
 2. **Install dependencies**
@@ -95,7 +95,7 @@ A modern PWA application built with Next.js that allows students to split their 
 ## Project Structure
 
 ```
-installo/
+wepply/
 ├── src/
 │   ├── app/
 │   │   ├── api/                 # API routes
@@ -191,4 +191,4 @@ This project is licensed under the MIT License.
 
 ## Support
 
-For support, email support@installo.com or create an issue in the repository.
+For support, email support@wepply.com or create an issue in the repository.

@@ -146,3 +146,6 @@ Once your new Clerk project is working:
 7. **Go live!**
 
 This approach gives you **complete control** and **works perfectly with Netlify**!
+
+
+
