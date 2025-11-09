@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Installo - Student Tuition Payment Plans',
-  description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students with no credit check required.',
-  keywords: 'tuition payment plans, student loans, installment payments, international students, university payments, flexible tuition, no credit check',
+  description: 'Access flexible tuition payment schedules. Manage your tuition payments in installments with no credit check required.',
+  keywords: 'tuition payment plans, installment payments, international students, university payments, flexible tuition, payment management, no credit check',
   authors: [{ name: 'Installo Team' }],
   creator: 'Installo',
   publisher: 'Installo',
@@ -24,7 +24,7 @@ export const metadata = {
     url: 'https://installo.com',
     siteName: 'Installo',
     title: 'Installo - Student Tuition Payment Plans',
-    description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students with no credit check required.',
+    description: 'Access flexible tuition payment schedules. Manage your tuition payments in installments with no credit check required.',
     images: [
       {
         url: '/og-image.jpg',
@@ -37,7 +37,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Installo - Student Tuition Payment Plans',
-    description: 'Split your tuition payments into manageable installments. Flexible payment plans for international students.',
+    description: 'Access flexible tuition payment schedules. Manage your tuition payments in installments.',
     images: ['/og-image.jpg'],
     creator: '@installo',
   },

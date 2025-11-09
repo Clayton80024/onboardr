@@ -277,7 +277,7 @@ export default function OnboardingPage() {
               </div>
               <CardTitle className="text-3xl font-bold text-white mb-2">Welcome to Installo!</CardTitle>
               <CardDescription className="text-gray-300 text-lg">
-                Let&apos;s get you started with splitting your tuition payments
+                Let&apos;s get you started with your flexible tuition payment schedule
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -467,7 +467,7 @@ export default function OnboardingPage() {
               </div>
               <CardTitle>Choose Payment Plan</CardTitle>
               <CardDescription>
-                Select how you&apos;d like to split your payments
+                Select your payment schedule
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

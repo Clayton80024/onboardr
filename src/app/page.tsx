@@ -4,7 +4,7 @@ import { SignInButton, SignUpButton, useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { GraduationCap, DollarSign, Shield, Clock, Users, CheckCircle, Star, Globe, CreditCard, ArrowRight, QrCode } from 'lucide-react'
+import { GraduationCap, DollarSign, Shield, Clock, Users, CheckCircle, Star, Globe, CreditCard, ArrowRight, QrCode, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import QRCodeComponent from '@/components/qr-code'
@@ -14,6 +14,7 @@ export default function HomePage() {
   const router = useRouter()
   const [isDevMode, setIsDevMode] = useState(false)
   const [qrUrl, setQrUrl] = useState('')
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null)
 
   useEffect(() => {
     const isDev = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes('placeholder') ?? false
@@ -93,35 +94,35 @@ export default function HomePage() {
           )}
           
           <Badge className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200">
-            🎓 Split My Tuition
+            🎓 Flexible Payment Schedule
           </Badge>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Split your tuition
+            Access a flexible tuition
             <br />
             <span className="text-green-400">
-              into manageable payments
+              payment schedule
             </span>
           </h1>
           
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Pay part of your tuition upfront and the rest later in the semester. 
-            We work directly with your university to offer flexible payment management. 
-            No credit check required for international students.
+            Access flexible payment schedules and complete your tuition over time. 
+            We coordinate with your university to make the process simple and transparent. 
+            No traditional credit check required.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
               <Shield className="w-5 h-5 text-green-400" />
-              <span className="text-sm font-medium text-white">No Credit Check</span>
+              <span className="text-sm font-medium text-white">No Traditional Credit Check</span>
             </div>
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
               <Clock className="w-5 h-5 text-green-400" />
-              <span className="text-sm font-medium text-white">Flexible Payment Management</span>
+              <span className="text-sm font-medium text-white">Flexible Tuition Payment Scheduling</span>
             </div>
             <div className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
               <Globe className="w-5 h-5 text-green-400" />
-              <span className="text-sm font-medium text-white">University Partnership</span>
+              <span className="text-sm font-medium text-white">Coordinated Directly With Your University</span>
             </div>
           </div>
 
@@ -141,7 +142,7 @@ export default function HomePage() {
                   size="lg" 
                   className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-4"
                 >
-                  Split My Tuition
+                  Get Started
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </SignUpButton>
@@ -168,23 +169,20 @@ export default function HomePage() {
           </div>
 
           <p className="text-sm text-gray-400 mt-6">
-            Trusted by 50,000+ international students • 
-            <a href="/fees" className="text-green-400 hover:text-green-300 underline ml-1">
-              View transparent pricing
-            </a>
+            Trusted by 50,000+ international students
           </p>
         </div>
       </section>
 
       {/* Universities Section */}
-      <section className="py-16 bg-white">
+      <section id="how-it-works" className="py-16 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              How tuition payment management works
+              How tuition payment scheduling works
             </h2>
             <p className="text-xl text-gray-600">
-              Simple, flexible payment management designed for international students
+              Simple, flexible payment schedules designed for international students
             </p>
           </div>
           
@@ -302,35 +300,35 @@ export default function HomePage() {
                         <p className="text-xs text-gray-600">Select Your Payment Schedule</p>
                       </div>
 
-                      {/* Payment Plans */}
+                      {/* Payment Schedules */}
                       <div className="space-y-2">
                         <div className="bg-green-50 rounded-lg p-2 border-2 border-green-500">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-xs font-semibold text-gray-900">2-Payment Schedule</h4>
+                            <h4 className="text-xs font-semibold text-gray-900">Basic Schedule</h4>
                             <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
                               <CheckCircle className="w-2 h-2 text-white" />
                             </div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-1">50% upfront, 50% later</p>
-                          <p className="text-xs font-bold text-green-600">$6,000 per payment</p>
+                          <p className="text-xs text-gray-600 mb-1">Pay upfront, complete remaining over time</p>
+                          <p className="text-xs font-bold text-green-600">Flexible amounts</p>
                         </div>
                         
                         <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-xs font-semibold text-gray-900">3-Payment Schedule</h4>
+                            <h4 className="text-xs font-semibold text-gray-900">Extended Schedule</h4>
                             <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-1">40% upfront, 30% + 30% later</p>
-                          <p className="text-xs font-bold text-gray-600">$4,000 per payment</p>
+                          <p className="text-xs text-gray-600 mb-1">Spread payments across semester</p>
+                          <p className="text-xs font-bold text-gray-600">Flexible amounts</p>
                         </div>
                         
                         <div className="bg-gray-50 rounded-lg p-2 border border-gray-200">
                           <div className="flex items-center justify-between mb-1">
-                            <h4 className="text-xs font-semibold text-gray-900">4-Payment Schedule</h4>
+                            <h4 className="text-xs font-semibold text-gray-900">Custom Schedule</h4>
                             <div className="w-4 h-4 border-2 border-gray-300 rounded-full"></div>
                           </div>
-                          <p className="text-xs text-gray-600 mb-1">40% upfront, 20% + 20% + 20% later</p>
-                          <p className="text-xs font-bold text-gray-600">$3,000 per payment</p>
+                          <p className="text-xs text-gray-600 mb-1">Tailored to your needs</p>
+                          <p className="text-xs font-bold text-gray-600">Flexible amounts</p>
                         </div>
                       </div>
 
@@ -459,7 +457,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  &quot;Installo made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
+                  &quot;Installo made it possible for me to manage my tuition payments without stressing about paying my tuition in full upfront. The flexible payment schedule saved my semester!&quot;
                 </p>
               </CardContent>
             </Card>
@@ -481,7 +479,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  &quot;As an international student, I was worried about credit checks. Installo&apos;s no-credit-check policy was exactly what I needed.&quot;
+                  &quot;As an international student, I was worried about credit checks. Installo&apos;s no-traditional-credit-check policy was exactly what I needed.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -530,7 +528,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;Installo made it possible for me to manage my tuition payments without stressing about having all the money upfront. The flexible payment management saved my semester!&quot;
+                      &quot;Installo made it possible for me to manage my tuition payments without stressing about paying my tuition in full upfront. The flexible payment schedule saved my semester!&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -554,7 +552,7 @@ export default function HomePage() {
                       ))}
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed">
-                      &quot;As an international student, I was worried about credit checks. Installo&apos;s no-credit-check policy was exactly what I needed.&quot;
+                      &quot;As an international student, I was worried about credit checks. Installo&apos;s no-traditional-credit-check policy was exactly what I needed.&quot;
                     </p>
                   </CardContent>
                 </Card>
@@ -658,6 +656,141 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-white scroll-mt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge className="mb-6 bg-gradient-to-r from-green-100 to-blue-100 text-green-800 border-green-200">
+              ❓ Common Questions
+            </Badge>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-gray-600">
+              Everything you need to know about our tuition payment management service
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* FAQ Item 1 */}
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <button
+                onClick={() => setOpenFAQ(openFAQ === 1 ? null : 1)}
+                className="w-full text-left"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                      <HelpCircle className="w-5 h-5 text-green-600 mr-2" />
+                      Do students need a credit check?
+                    </CardTitle>
+                    {openFAQ === 1 ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                </CardHeader>
+              </button>
+              {openFAQ === 1 && (
+                <CardContent className="pt-0 pb-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    No traditional credit check is required. We review eligibility based on enrollment and F‑1 status.
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* FAQ Item 2 */}
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <button
+                onClick={() => setOpenFAQ(openFAQ === 2 ? null : 2)}
+                className="w-full text-left"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                      <HelpCircle className="w-5 h-5 text-green-600 mr-2" />
+                      How long can I spread my tuition payments?
+                    </CardTitle>
+                    {openFAQ === 2 ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                </CardHeader>
+              </button>
+              {openFAQ === 2 && (
+                <CardContent className="pt-0 pb-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    Up to 9 months, depending on your university&apos;s billing policies.
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* FAQ Item 3 */}
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <button
+                onClick={() => setOpenFAQ(openFAQ === 3 ? null : 3)}
+                className="w-full text-left"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                      <HelpCircle className="w-5 h-5 text-green-600 mr-2" />
+                      Do you advance tuition funds?
+                    </CardTitle>
+                    {openFAQ === 3 ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                </CardHeader>
+              </button>
+              {openFAQ === 3 && (
+                <CardContent className="pt-0 pb-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    No. Installo helps students manage and schedule payments directly with their university.
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+
+            {/* FAQ Item 4 */}
+            <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+              <button
+                onClick={() => setOpenFAQ(openFAQ === 4 ? null : 4)}
+                className="w-full text-left"
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+                      <HelpCircle className="w-5 h-5 text-green-600 mr-2" />
+                      Is this service available for all universities?
+                    </CardTitle>
+                    {openFAQ === 4 ? (
+                      <ChevronUp className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                </CardHeader>
+              </button>
+              {openFAQ === 4 && (
+                <CardContent className="pt-0 pb-4">
+                  <p className="text-gray-700 leading-relaxed">
+                    Installo works with universities that partner with us. Contact us to see if your school is supported.
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -704,33 +837,36 @@ export default function HomePage() {
                 <span className="text-xl font-bold">Installo</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
-                Helping international students manage their tuition payments with flexible payment management solutions, working directly with universities.
+                Helping international students pay their tuition flexibly and on time, with direct coordination with their universities.
               </p>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">How It Works</a></li>
-                <li><a href="/fees" className="hover:text-white">Pricing & Fees</a></li>
-                <li><a href="#" className="hover:text-white">Universities</a></li>
-                <li><a href="#" className="hover:text-white">FAQ</a></li>
+                <li><a href="#how-it-works" className="hover:text-white">How It Works</a></li>
+                {/* <li><a href="/fees" className="hover:text-white">Pricing & Fees</a></li> */}
+                {/* <li><a href="#" className="hover:text-white">Universities</a></li> */}
+                <li><a href="#faq" className="hover:text-white">FAQ</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Support</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white">Status</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
+                {/* <li><a href="#" className="hover:text-white">Help Center</a></li> */}
+                {/* <li><a href="#" className="hover:text-white">Contact Us</a></li> */}
+                {/* <li><a href="#" className="hover:text-white">Status</a></li> */}
+                {/* <li><a href="#" className="hover:text-white">Security</a></li> */}
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© 2024 Installo. All rights reserved.</p>
+          <div className="border-t border-gray-800 mt-12 pt-8">
+            <p className="text-sm text-gray-400 text-center mb-4 max-w-4xl mx-auto">
+              Installo is a tuition payment management service. We do not provide loans or financing. Students complete their payments according to their chosen schedule directly with their university.
+            </p>
+            <p className="text-center text-gray-400">© 2024 Installo. All rights reserved.</p>
           </div>
         </div>
       </footer>
