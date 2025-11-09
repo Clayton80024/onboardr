@@ -20,7 +20,7 @@ interface PaymentFormProps {
   paymentPlan: string
   formData: Record<string, unknown>
   user: UserResource | null
-  onSuccess: (subscriptionId: string) => void
+  onSuccess: (paymentIntentId: string) => void
   onError: (error: string) => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
@@ -77,11 +77,12 @@ function PaymentForm({
         return
       }
 
-      // Create subscription
-      const response = await fetch('/api/stripe/create-subscription', {
+      // Create hybrid payment system (Card + ACH) via Supabase Edge Function
+      const response = await fetch('https://gdhgsmccaqycmvxxoaif.supabase.co/functions/v1/create-hybrid-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           paymentMethodId: paymentMethod.id,
@@ -113,12 +114,13 @@ function PaymentForm({
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to create subscription')
+        throw new Error(result.error || 'Failed to create hybrid payment system')
       }
 
-      // For subscriptions, the payment is automatically processed
-      // No need to confirm payment intent separately
-      onSuccess(result.subscriptionId)
+      // For hybrid payments, the first payment is automatically processed
+      // Remaining payments will be handled via ACH payment links
+      setIsLoading(false) // Clear loading state
+      onSuccess(result.upfrontPaymentIntentId)
     } catch (error) {
       console.error('Payment error:', error)
       onError(error instanceof Error ? error.message : 'Payment failed')
@@ -148,6 +150,7 @@ function PaymentForm({
                     color: '#9e2146',
                   },
                 },
+                hidePostalCode: false, // Show zipcode field
               }}
             />
           </div>
@@ -255,7 +258,7 @@ export default function StripePayment({
             Payment Information
           </CardTitle>
           <CardDescription>
-            Complete your payment to start your installment plan. Your card will be charged ${calculateFirstPayment(tuitionAmount, paymentPlan).toFixed(2)} today, then ${calculateFirstPayment(tuitionAmount, paymentPlan).toFixed(2)} each month for your remaining installments.
+            Complete your payment to start your hybrid installment plan. Your card will be charged ${calculateFirstPayment(tuitionAmount, paymentPlan).toFixed(2)} today, then you&apos;ll receive ACH payment links for your remaining installments (lower fees!).
           </CardDescription>
         </CardHeader>
         <CardContent>
