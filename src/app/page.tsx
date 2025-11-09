@@ -93,20 +93,20 @@ export default function HomePage() {
           )}
           
           <Badge className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200">
-            🎓 Split My Tuition
+            🎓 Flexible Payment Schedule
           </Badge>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Split your tuition
+            Access a flexible tuition
             <br />
             <span className="text-green-400">
-              into manageable payments
+              payment schedule
             </span>
           </h1>
           
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Pay part of your tuition upfront and the rest later in the semester. 
-            We work directly with your university to offer flexible payment management. 
+            Access flexible payment schedules that let you pay part of your tuition upfront and the rest throughout the semester. 
+            We work directly with your university to manage your payment schedule. 
             No credit check required for international students.
           </p>
 
@@ -141,7 +141,7 @@ export default function HomePage() {
                   size="lg" 
                   className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-4"
                 >
-                  Split My Tuition
+                  Get Started
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </SignUpButton>
