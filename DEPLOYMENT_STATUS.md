@@ -52,8 +52,8 @@ supabase functions deploy create-hybrid-payment
 
 ### **Current Status:**
 - ✅ Code is in GitHub
-- ❓ Function deployment status: **UNKNOWN** (needs verification)
-- ❓ Environment variables: **NEEDS VERIFICATION**
+- ✅ Function is **DEPLOYED** (verified via HTTP 401 response - requires auth)
+- ⚠️ Environment variables: **NEEDS VERIFICATION**
 
 ### **Action Required:**
 1. Deploy Edge Function to Supabase
