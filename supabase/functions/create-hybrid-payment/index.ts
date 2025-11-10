@@ -51,6 +51,9 @@ serve(async (req) => {
     } = await req.json()
 
     console.log('🚀 Creating hybrid payment system...')
+    console.log('📧 Received email for user:', email || 'NOT PROVIDED')
+    console.log('📧 Received userId:', userId || 'NOT PROVIDED')
+    console.log('📧 Received firstName:', firstName || 'NOT PROVIDED')
 
     // Calculate payment amounts based on plan
     const paymentPlans = {
@@ -311,8 +314,12 @@ serve(async (req) => {
 
     // Send onboarding completion email to Clerk sign-up email (non-blocking)
     // The email variable contains the Clerk user's sign-up email address
+    console.log(`📧 Email sending check - email variable: ${email || 'MISSING'}`)
+    console.log(`📧 Email sending check - userId: ${userId || 'MISSING'}`)
+    
     if (!email) {
-      console.warn('⚠️ No email address available for sending onboarding email')
+      console.error('❌ No email address available for sending onboarding email')
+      console.error('❌ Email variable is empty or undefined')
     } else {
       try {
         console.log(`📧 Sending onboarding email to Clerk user: ${email}`)
@@ -323,9 +330,11 @@ serve(async (req) => {
         const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://tryinstallo.com'
         
         if (!resendApiKey) {
-          console.warn('⚠️ RESEND_API_KEY not set in Supabase Edge Functions environment variables')
-          console.warn('⚠️ Email will not be sent. Please add RESEND_API_KEY to Supabase Edge Functions settings')
+          console.error('❌ RESEND_API_KEY not set in Supabase Edge Functions environment variables')
+          console.error('❌ Email will not be sent. Please add RESEND_API_KEY to Supabase Edge Functions settings')
+          console.error('❌ Go to: Supabase Dashboard → Edge Functions → Settings → Add RESEND_API_KEY')
         } else {
+          console.log(`✅ RESEND_API_KEY found: ${resendApiKey.substring(0, 10)}...`)
           // Generate email HTML
           const planNames = {
             basic: 'Fast Track (1+4 payments)',
@@ -393,6 +402,11 @@ serve(async (req) => {
           `
           
           // Send email via Resend API
+          console.log(`📧 Attempting to send email via Resend API...`)
+          console.log(`📧 From: ${resendFromEmail}`)
+          console.log(`📧 To: ${email}`)
+          console.log(`📧 API Key present: ${!!resendApiKey}`)
+          
           const resendResponse = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -407,16 +421,30 @@ serve(async (req) => {
             }),
           })
 
+          console.log(`📧 Resend API response status: ${resendResponse.status}`)
+          
           if (resendResponse.ok) {
             const emailData = await resendResponse.json()
-            console.log(`📧 Onboarding email sent successfully to ${email}: ${emailData.id}`)
+            console.log(`✅ Onboarding email sent successfully to ${email}`)
+            console.log(`✅ Email ID: ${emailData.id}`)
           } else {
-            const errorData = await resendResponse.json()
-            console.warn(`⚠️ Failed to send onboarding email to ${email}:`, errorData)
+            const errorText = await resendResponse.text()
+            let errorData
+            try {
+              errorData = JSON.parse(errorText)
+            } catch {
+              errorData = { error: errorText }
+            }
+            console.error(`❌ Failed to send onboarding email to ${email}`)
+            console.error(`❌ Status: ${resendResponse.status}`)
+            console.error(`❌ Error:`, JSON.stringify(errorData, null, 2))
           }
         }
       } catch (emailError) {
-        console.warn(`⚠️ Error sending onboarding email to ${email}:`, emailError.message)
+        console.error(`❌ Exception while sending onboarding email to ${email}:`)
+        console.error(`❌ Error type: ${emailError.constructor.name}`)
+        console.error(`❌ Error message: ${emailError.message}`)
+        console.error(`❌ Error stack:`, emailError.stack)
         // Don't fail the entire request if email fails
       }
     }
