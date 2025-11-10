@@ -2,7 +2,7 @@
 
 ## ✅ Your Resend Setup
 
-**API Key:** `re_B5f25EBx_Hdh4dfU4jzat6kMC1eb82wYX`  
+**API Key:** `re_RqN1Qvag_HxyrXMhQXNvDzGBaucePHqh9` (Full Access)  
 **Verified Domain:** `notifications.tryinstallo.com` (to avoid conflicts with Zoho on main domain)
 
 ## 🔧 Environment Variables
@@ -11,7 +11,7 @@ Add these to your `.env.local` file:
 
 ```env
 # Resend Email Service
-RESEND_API_KEY=re_B5f25EBx_Hdh4dfU4jzat6kMC1eb82wYX
+RESEND_API_KEY=re_RqN1Qvag_HxyrXMhQXNvDzGBaucePHqh9
 RESEND_FROM_EMAIL=noreply@notifications.tryinstallo.com
 ```
 
@@ -66,7 +66,7 @@ This works immediately but is only for testing. Switch to your subdomain email o
 Add these environment variables in your deployment platform:
 
 ```env
-RESEND_API_KEY=re_B5f25EBx_Hdh4dfU4jzat6kMC1eb82wYX
+RESEND_API_KEY=re_RqN1Qvag_HxyrXMhQXNvDzGBaucePHqh9
 RESEND_FROM_EMAIL=noreply@notifications.tryinstallo.com
 ```
 
