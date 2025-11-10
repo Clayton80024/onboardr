@@ -19,6 +19,7 @@ A modern PWA application built with Next.js that allows students to split their 
 - **Authentication**: Clerk
 - **Database**: Supabase
 - **Payments**: Stripe
+- **Email**: Resend (for onboarding completion emails)
 - **PWA**: next-pwa
 
 ## Getting Started
@@ -68,6 +69,10 @@ A modern PWA application built with Next.js that allows students to split their 
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
    STRIPE_SECRET_KEY=your_stripe_secret_key
    STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+
+   # Resend Email (Optional - for onboarding emails)
+   RESEND_API_KEY=re_B5f25EBx_Hdh4dfU4jzat6kMC1eb82wYX
+   RESEND_FROM_EMAIL=noreply@notifications.tryinstallo.com
    ```
 
 4. **Set up Supabase database**
@@ -84,12 +89,17 @@ A modern PWA application built with Next.js that allows students to split their 
    - Set up webhooks pointing to `/api/webhooks/stripe`
    - Enable the necessary payment methods
 
-7. **Run the development server**
+7. **Configure Resend (Optional)**
+   - Create a Resend account at [resend.com](https://resend.com)
+   - Get your API key and add it to `.env.local`
+   - See `RESEND_EMAIL_SETUP.md` for detailed instructions
+
+8. **Run the development server**
    ```bash
    npm run dev
    ```
 
-8. **Open your browser**
+9. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Project Structure

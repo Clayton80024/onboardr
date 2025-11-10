@@ -309,6 +309,50 @@ serve(async (req) => {
 
     console.log(`💳 Created ${payments.length} payment records`)
 
+    // Send onboarding completion email to Clerk sign-up email (non-blocking)
+    // The email variable contains the Clerk user's sign-up email address
+    if (!email) {
+      console.warn('⚠️ No email address available for sending onboarding email')
+    } else {
+      try {
+        console.log(`📧 Sending onboarding email to Clerk user: ${email}`)
+        const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'http://localhost:3000'
+        const emailResponse = await fetch(`${appUrl}/api/send-onboarding-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email, // Clerk sign-up email address
+            firstName: firstName,
+            lastName: lastName,
+            universityName: universityName,
+            tuitionAmount: tuition,
+            adminFee: adminFee,
+            totalAmount: totalAmount,
+            paymentPlan: paymentPlan,
+            installmentAmount: installmentAmount,
+            totalPayments: plan.totalPayments,
+            remainingPayments: plan.remainingPayments,
+            studentId: studentId,
+            studentEmail: studentEmail,
+          }),
+        })
+
+        if (emailResponse.ok) {
+          const emailData = await emailResponse.json()
+          console.log(`📧 Onboarding email sent successfully to ${email}: ${emailData.messageId}`)
+        } else {
+          const errorData = await emailResponse.json()
+          console.warn(`⚠️ Failed to send onboarding email to ${email}: ${errorData.error}`)
+          // Don't fail the entire request if email fails
+        }
+      } catch (emailError) {
+        console.warn(`⚠️ Error sending onboarding email to ${email}: ${emailError.message}`)
+        // Don't fail the entire request if email fails
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
