@@ -94,7 +94,8 @@ function PaymentForm({
           userId: user?.id,
           firstName: formData.firstName || user?.firstName || '',
           lastName: formData.lastName || user?.lastName || '',
-          email: formData.email || user?.emailAddresses[0]?.emailAddress || '',
+          // Always use Clerk sign-up email (primary email from authentication)
+          email: user?.emailAddresses[0]?.emailAddress || formData.email || '',
           phoneNumber: formData.phoneNumber,
           address: formData.address,
           city: formData.city,
