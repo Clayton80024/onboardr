@@ -316,39 +316,107 @@ serve(async (req) => {
     } else {
       try {
         console.log(`📧 Sending onboarding email to Clerk user: ${email}`)
-        const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'http://localhost:3000'
-        const emailResponse = await fetch(`${appUrl}/api/send-onboarding-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email, // Clerk sign-up email address
-            firstName: firstName,
-            lastName: lastName,
-            universityName: universityName,
-            tuitionAmount: tuition,
-            adminFee: adminFee,
-            totalAmount: totalAmount,
-            paymentPlan: paymentPlan,
-            installmentAmount: installmentAmount,
-            totalPayments: plan.totalPayments,
-            remainingPayments: plan.remainingPayments,
-            studentId: studentId,
-            studentEmail: studentEmail,
-          }),
-        })
-
-        if (emailResponse.ok) {
-          const emailData = await emailResponse.json()
-          console.log(`📧 Onboarding email sent successfully to ${email}: ${emailData.messageId}`)
+        
+        // Get Resend configuration from environment variables
+        const resendApiKey = Deno.env.get('RESEND_API_KEY')
+        const resendFromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@notifications.tryinstallo.com'
+        const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://tryinstallo.com'
+        
+        if (!resendApiKey) {
+          console.warn('⚠️ RESEND_API_KEY not set in Supabase Edge Functions environment variables')
+          console.warn('⚠️ Email will not be sent. Please add RESEND_API_KEY to Supabase Edge Functions settings')
         } else {
-          const errorData = await emailResponse.json()
-          console.warn(`⚠️ Failed to send onboarding email to ${email}: ${errorData.error}`)
-          // Don't fail the entire request if email fails
+          // Generate email HTML
+          const planNames = {
+            basic: 'Fast Track (1+4 payments)',
+            premium: 'Most Popular (1+6 payments)',
+            flexible: 'Flexible (1+8 payments)'
+          }
+          const planName = planNames[paymentPlan as keyof typeof planNames] || paymentPlan
+          
+          const emailHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Installo!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 20px; text-align: center;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Welcome to Installo! 🎓</h1>
+              <p style="margin: 10px 0 0; color: #f0f0f0; font-size: 16px;">Your payment plan has been activated</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #374151; font-size: 16px; line-height: 1.6;">Hi ${firstName},</p>
+              <p style="margin: 0 0 20px; color: #374151; font-size: 16px; line-height: 1.6;">Congratulations! Your tuition payment plan has been successfully set up. We're excited to help you manage your payments with flexibility and ease.</p>
+              <div style="background-color: #f9fafb; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                <h2 style="margin: 0 0 15px; color: #111827; font-size: 20px; font-weight: 600;">Payment Plan Summary</h2>
+                <table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                  <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">University:</td><td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${universityName}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Student ID:</td><td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${studentId}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Payment Plan:</td><td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">${planName}</td></tr>
+                  <tr style="border-top: 1px solid #e5e7eb;"><td style="padding: 12px 0 8px; color: #6b7280; font-size: 14px;">Tuition Amount:</td><td style="padding: 12px 0 8px; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">$${tuition.toFixed(2)}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Admin Fee:</td><td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600; text-align: right;">$${adminFee.toFixed(2)}</td></tr>
+                  <tr style="border-top: 2px solid #e5e7eb;"><td style="padding: 12px 0 0; color: #111827; font-size: 16px; font-weight: 700;">Total Amount:</td><td style="padding: 12px 0 0; color: #10b981; font-size: 18px; font-weight: 700; text-align: right;">$${totalAmount.toFixed(2)}</td></tr>
+                </table>
+              </div>
+              <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                <h2 style="margin: 0 0 15px; color: #111827; font-size: 20px; font-weight: 600;">Payment Schedule</h2>
+                <p style="margin: 0 0 8px; color: #6b7280; font-size: 14px;"><strong style="color: #10b981;">✅ First Payment (Paid):</strong> $${installmentAmount.toFixed(2)}</p>
+                <p style="margin: 0; color: #6b7280; font-size: 14px;"><strong style="color: #3b82f6;">📅 Remaining Payments:</strong> ${plan.remainingPayments} × $${installmentAmount.toFixed(2)} each</p>
+              </div>
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin: 30px 0;">
+                <tr><td style="text-align: center;"><a href="${appUrl}/dashboard" style="display: inline-block; padding: 14px 32px; background-color: #10b981; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">View Dashboard</a></td></tr>
+              </table>
+              <p style="margin: 20px 0 0; color: #374151; font-size: 16px; line-height: 1.6;">Best regards,<br><strong>The Installo Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 40px; background-color: #f9fafb; border-radius: 0 0 8px 8px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; color: #9ca3af; font-size: 12px;">© ${new Date().getFullYear()} Installo. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+          `
+          
+          // Send email via Resend API
+          const resendResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: resendFromEmail,
+              to: [email],
+              subject: 'Welcome to Installo! Your payment plan is ready 🎓',
+              html: emailHTML,
+            }),
+          })
+
+          if (resendResponse.ok) {
+            const emailData = await resendResponse.json()
+            console.log(`📧 Onboarding email sent successfully to ${email}: ${emailData.id}`)
+          } else {
+            const errorData = await resendResponse.json()
+            console.warn(`⚠️ Failed to send onboarding email to ${email}:`, errorData)
+          }
         }
       } catch (emailError) {
-        console.warn(`⚠️ Error sending onboarding email to ${email}: ${emailError.message}`)
+        console.warn(`⚠️ Error sending onboarding email to ${email}:`, emailError.message)
         // Don't fail the entire request if email fails
       }
     }
