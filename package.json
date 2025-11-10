@@ -11,7 +11,8 @@
     "supabase:stop": "supabase stop",
     "supabase:deploy": "supabase functions deploy stripe-webhook",
     "supabase:deploy:hybrid": "supabase functions deploy create-hybrid-payment",
-    "supabase:deploy:all": "supabase functions deploy stripe-webhook && supabase functions deploy create-hybrid-payment",
+    "supabase:deploy:email": "supabase functions deploy send-onboarding-email",
+    "supabase:deploy:all": "supabase functions deploy stripe-webhook && supabase functions deploy create-hybrid-payment && supabase functions deploy send-onboarding-email",
     "supabase:logs": "supabase functions logs stripe-webhook",
     "supabase:logs:hybrid": "supabase functions logs create-hybrid-payment"
   },
